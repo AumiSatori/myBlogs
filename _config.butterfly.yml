@@ -98,3 +98,13 @@ busuanzi:
   site_uv: false
   site_pv: false
   page_pv: false
+
+# ---------- 自定义注入 ----------
+# Live2D 看板娘（右下角）——资源全部自托管在 source/live2d/ 下，不依赖外部 CDN
+# 换模型：改 source/live2d/waifu-tips.json 里的 models 数组
+# 调位置：改 source/live2d/live2d-custom.css
+# 关闭：把下面的 bottom 那行注释掉即可
+inject:
+  head:
+  bottom:
+    - <script src="/live2d/autoload.js"></script>

@@ -1,0 +1,93 @@
+/*!
+ * Live2D 看板娘定位补丁
+ * 把看板娘从默认的左下角挪到右下角，并让出主题自带按钮组的位置
+ *
+ * ⚠️ 本文件由 autoload.js 在 waifu.css 之后加载，
+ *    否则同优先级下会被 waifu.css 的默认样式覆盖。
+ */
+
+/* ---------- 容器：左下角 -> 右下角 ---------- */
+#waifu {
+	left: auto;
+	right: 0;
+	/* #waifu-canvas 是块级元素，不给宽度会撑满整个视口 */
+	width: 480px;
+}
+
+#waifu-canvas {
+	width: 100%;
+}
+
+/* canvas 默认是 inline，底部会多出一截行高空隙；
+   尺寸同时决定模型的实际显示大小（Cubism 4 模型按 canvas 等比缩放） */
+#live2d {
+	display: block;
+	height: 480px;
+	width: 480px;
+}
+
+/* ---------- 收起后的「召唤」按钮也跟着挪到右边 ---------- */
+#waifu-toggle {
+	justify-content: flex-start;
+	left: auto;
+	margin-left: 0;
+	margin-right: -100px;
+	right: 0;
+	transition: margin-right 1s;
+}
+
+#waifu-toggle.waifu-toggle-active {
+	margin-left: 0;
+	margin-right: -50px;
+}
+
+#waifu-toggle.waifu-toggle-active:hover {
+	margin-left: 0;
+	margin-right: -30px;
+}
+
+/* ---------- 工具条移到模型左侧，避免超出屏幕右缘 ---------- */
+#waifu-tool {
+	left: -10px;
+	right: auto;
+}
+
+/* ---------- 气泡提示向左展开 ---------- */
+#waifu-tips {
+	left: auto;
+	margin: -30px 10px 0 0;
+	right: 0;
+	width: 280px;
+}
+
+/* ---------- 给主题右下角的按钮组（#rightside）让位 ---------- */
+@media screen and (min-width: 992px) {
+	#rightside {
+		bottom: 520px;
+	}
+}
+
+/* ---------- 中等屏幕：缩小一圈，免得压住右侧栏 ---------- */
+@media screen and (min-width: 992px) and (max-width: 1599px) {
+	#waifu {
+		width: 400px;
+	}
+
+	#live2d {
+		height: 400px;
+		width: 400px;
+	}
+
+	#rightside {
+		bottom: 440px;
+	}
+}
+
+/* ---------- 小屏直接隐藏，避免遮挡正文 ---------- */
+@media screen and (max-width: 991px) {
+
+	#waifu,
+	#waifu-toggle {
+		display: none !important;
+	}
+}
