@@ -7,3 +7,6 @@ public/
 .deploy*/
 _multiconfig.yml
 .idea/
+
+# AI 助手工作区数据（本机记忆 / 产物 / 临时文件）
+.workbuddy-ai/
