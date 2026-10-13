@@ -136,6 +136,12 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
 7. **`oh-my-live2d` 的官方模型域名 `model.oml2d.com` 已被抢注**，返回垃圾站 HTML，官方文档里的模型地址全部失效。不要回退到那套方案。
 8. **看板娘尺寸统一由 `--waifu-size` 一个变量控制**，它同时决定 `#waifu` 宽度、`#live2d` 画布边长，以及 `#rightside` 的让位高度（`calc(var(--waifu-size) + var(--waifu-gap))`）。改尺寸**只改这个变量**，别去单独改 `#live2d` 的宽高，否则主题按钮组会错位。
    - ⚠️ 「大小」的观感按**面积**算：`--waifu-size` 减半 = 视觉上小到 **1/4**。
+9. **`<canvas id="live2d">` 的 `width` / `height` 属性 ≠ 显示大小**，别被它误导：
+   - 属性值 = **内部渲染缓冲分辨率**，由 `waifu-tips.js` 初始写成 `800x800`；
+   - 显示大小 = `live2d-custom.css` 里 CSS 的 `--waifu-size`，两者互相独立；
+   - **Cubism 4 模型**（`whale-girl`）加载后，运行时会**把属性改写**成 CSS 尺寸（如 `200x200`）；
+     **Cubism 2 模型**（`shizuku` / `izumi` / `nito`）**不改写，保持 `800x800`**；
+   - ⇒ 在 DevTools 里看到 `800x800` 属**正常现象**（说明当前加载的是 Cubism 2 模型），**显示尺寸仍由 CSS 决定**，且内部 800 反而让画面更锐利。要核对实际大小，看 **Computed** 里的 `width` / `height`，或直接看视觉。
 
 ### 本地验证手法
 
