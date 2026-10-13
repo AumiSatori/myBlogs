@@ -345,6 +345,13 @@
   },
   "models": [
     {
+      "name": "da-feiyu",
+      "paths": [
+        "/live2d/models/da-feiyu/大肥鱼.model3.json"
+      ],
+      "message": "我是小鲸鱼女仆～今天也要好好干活哦！"
+    },
+    {
       "name": "shizuku",
       "paths": [
         "/live2d/models/shizuku/shizuku.model.json"

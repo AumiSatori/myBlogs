@@ -111,4 +111,4 @@ busuanzi:
 inject:
   head:
   bottom:
-    - <script src="/live2d/autoload.js?v=20261013b"></script>
+    - <script src="/live2d/autoload.js?v=20261013c"></script>

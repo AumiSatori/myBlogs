@@ -96,12 +96,21 @@ _config.butterfly.yml (inject.bottom)
 
 | 目录 | 格式 | 内核 | 体积 | 说明 |
 | --- | --- | --- | --- | --- |
-| `shizuku/` | Cubism 2（`.moc`） | `live2d.min.js` | 2.7M | **当前唯一模型**（橙色双马尾），入口 `shizuku.model.json` |
+| `da-feiyu/` | Cubism 4（`.moc3`） | `live2dcubismcore.min.js` | 2.5M | **默认模型**，大肥鱼（B 站免费模型，**围裙带原作者署名水印**） |
+| `shizuku/` | Cubism 2（`.moc`） | `live2d.min.js` | 2.7M | 橙色双马尾，可切换 |
 
-> **2026-10-13 按主人要求只保留 `shizuku`**。原先还有 `whale-girl`（Cubism 4 大肥鱼，4.1M）、`izumi`（3.3M）、`nito`（794K），均已删除。
-> **文件在 git 历史里**，需要时用 `git checkout <commit> -- source/live2d/models/<目录名>` 即可恢复（相关 commit：`401b9e8` 引入、`9b2950a` 删除前的最后状态）。
->
-> ⚠️ **Cubism 4 内核（`live2dcubismcore.min.js` + `chunk/index2.js`，约 400K）仍然保留**，`autoload.js` 的 `cubism5Path` 也照常传。当前没有 `.moc3` 模型用不到它，但留着以后加 Cubism 4 模型零成本——**别当成冗余删掉**。
+`da-feiyu` 原始纹理为 **8192×8192 / 30MB**，已压缩为 **2048×2048 / 1.12MB**（看板娘显示仅 200~240px，8~10 倍超采样足够），故目录名为 `大肥鱼.2048`。已删除 VTube Studio 专用文件（`*.vtube.json`、`items_pinned_to_model.json`），与本项目无关。
+
+⚠️ **模型文件路径含中文**（`大肥鱼.model3.json`）。hexo / 浏览器 / Cubism 都能正确处理，但用脚本或命令行处理时记得 URL 编码。
+
+#### da-feiyu 的水印（重要）
+
+- 模型自带**两处水印贴图 ArtMesh**（`水印.png` / `水印2.png`），**渲染在白色围裙上**，内容为：
+  `免费使用 禁止贩卖` / `绘画/Must: GPT-6` / `建模/Rigger: 香甜小兔子` / `Bilibili工房` / `用户: Mao绒绒家园` / `UID: 431301506`
+- 原作者在 VTube Studio 里留了消除开关：参数 **`Paramcol_3`（显示名「3.水印消除」）= 1.0**，对应文件 `EXP/13 水印消除.exp3.json`（`Blend: Add`）。
+- ⚠️ **已试过但没成功的方案**：给 `model3.json` 注册一个 Idle motion（`Curves` 直接把 `Paramcol_3` 钉在 1.0）。运行时**确实每帧都会 `startRandomMotion("Idle", 1)`**、motion 文件也被反复加载，但水印不消失 ⇒ 该参数不是简单开关，别在这条路上继续耗时间。真要消除只能**改纹理**（需先解析 `moc3` 拿水印 ArtMesh 的 UV）或宿主程序手动触发表达式。
+- 授权为「免费使用 禁止贩卖」⇒ 个人博客展示**无版权问题**；**官方建议保留署名**，本项目选择保留水印。
+
 
 ### 换模型 / 调位置 / 关闭
 
@@ -192,3 +201,4 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 - 2026-10-13 看板娘尺寸减半（480→240px，中等屏 400→200px），并把尺寸抽成 `--waifu-size` / `--waifu-gap` 变量统一控制；`#waifu-tool` 的纵向位置改为跟随尺寸计算。
 - 2026-10-13 接入 **`?v=` 缓存版本号**：`autoload.js` 的 `ASSET_VERSION` + `_config.butterfly.yml` 里 `autoload.js` 的 `?v=`。起因是「改了 CSS、线上仍是旧的 480px」——静态资源被长缓存。现已覆盖 6 个核心资源。
 - 2026-10-13 按主人要求**精简模型**：删除 `whale-girl`（大肥鱼）/ `izumi` / `nito`，**只保留 `shizuku`（橙色双马尾）**并设为默认。`source/live2d/` 体积 12M → 3.4M。Cubism 4 内核保留备用（见模型清单节）。
+- 2026-10-13 接入 B 站免费模型 **`da-feiyu`（大肥鱼）**并设为默认：纹理 8192→2048 压缩（30M→1.1M），清理 VTube Studio 专用文件；**围裙带原作者署名水印，按「免费使用」授权选择保留**。缓存版本号 → `20261013c`。
