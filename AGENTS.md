@@ -96,12 +96,12 @@ _config.butterfly.yml (inject.bottom)
 
 | 目录 | 格式 | 内核 | 体积 | 说明 |
 | --- | --- | --- | --- | --- |
-| `whale-girl/` | Cubism 4（`.moc3`） | `live2dcubismcore.min.js` | 4.1M | **默认模型**，小鲸鱼女仆（大肥鱼） |
-| `shizuku/` | Cubism 2（`.moc`） | `live2d.min.js` | 2.7M | |
-| `izumi/` | Cubism 2（`.moc`） | `live2d.min.js` | 3.3M | 体积最大，可考虑删除 |
-| `nito/` | Cubism 2（`.moc`） | `live2d.min.js` | 794K | |
+| `shizuku/` | Cubism 2（`.moc`） | `live2d.min.js` | 2.7M | **当前唯一模型**（橙色双马尾），入口 `shizuku.model.json` |
 
-`whale-girl` 含 2 张纹理、44 个表情（`.exp3.json`）、8 个动作（`motions/*.motion3.json`），入口文件为 `c_0120.model3.json`。
+> **2026-10-13 按主人要求只保留 `shizuku`**。原先还有 `whale-girl`（Cubism 4 大肥鱼，4.1M）、`izumi`（3.3M）、`nito`（794K），均已删除。
+> **文件在 git 历史里**，需要时用 `git checkout <commit> -- source/live2d/models/<目录名>` 即可恢复（相关 commit：`401b9e8` 引入、`9b2950a` 删除前的最后状态）。
+>
+> ⚠️ **Cubism 4 内核（`live2dcubismcore.min.js` + `chunk/index2.js`，约 400K）仍然保留**，`autoload.js` 的 `cubism5Path` 也照常传。当前没有 `.moc3` 模型用不到它，但留着以后加 Cubism 4 模型零成本——**别当成冗余删掉**。
 
 ### 换模型 / 调位置 / 关闭
 
@@ -139,8 +139,9 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
 9. **`<canvas id="live2d">` 的 `width` / `height` 属性 ≠ 显示大小**，别被它误导：
    - 属性值 = **内部渲染缓冲分辨率**，由 `waifu-tips.js` 初始写成 `800x800`；
    - 显示大小 = `live2d-custom.css` 里 CSS 的 `--waifu-size`，两者互相独立；
-   - **Cubism 4 模型**（`whale-girl`）加载后，运行时会**把属性改写**成 CSS 尺寸（如 `200x200`）；
-     **Cubism 2 模型**（`shizuku` / `izumi` / `nito`）**不改写，保持 `800x800`**；
+   - **Cubism 4 模型**（如已删除的 `whale-girl`）加载后，运行时会**把属性改写**成 CSS 尺寸（如 `200x200`）；
+     **Cubism 2 模型**（当前的 `shizuku`）**不改写，保持 `800x800`**；
+   - ⇒ **当前只剩 shizuku（Cubism 2），所以线上看到的 canvas 属性就是 `800x800`**，属正常现象，别误判成「尺寸没生效」；
    - ⇒ 在 DevTools 里看到 `800x800` 属**正常现象**（说明当前加载的是 Cubism 2 模型），**显示尺寸仍由 CSS 决定**，且内部 800 反而让画面更锐利。要核对实际大小，看 **Computed** 里的 `width` / `height`，或直接看视觉。
 10. **改了 `/live2d/` 下的文件、线上却没变 ⇒ 先怀疑缓存**。Cloudflare 对静态资源做长缓存，URL 不变时浏览器会一直吃旧文件。本项目用 **`?v=` 版本号**解决，**改完必须同步更新两处**（否则白改）：
     - `source/live2d/autoload.js` 顶部的 `ASSET_VERSION` —— 管 `waifu.css` / `live2d-custom.css` / `waifu-tips.js` / 两个内核 / `waifu-tips.json`；
@@ -189,3 +190,4 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 - 2026-10-13 新增 Cubism 4 模型 `whale-girl`（小鲸鱼女仆），接入 `live2dcubismcore.min.js` 双内核加载链，并设为默认模型。已验证 4 个模型均可正常渲染与切换。
 - 2026-10-13 看板娘尺寸减半（480→240px，中等屏 400→200px），并把尺寸抽成 `--waifu-size` / `--waifu-gap` 变量统一控制；`#waifu-tool` 的纵向位置改为跟随尺寸计算。
 - 2026-10-13 接入 **`?v=` 缓存版本号**：`autoload.js` 的 `ASSET_VERSION` + `_config.butterfly.yml` 里 `autoload.js` 的 `?v=`。起因是「改了 CSS、线上仍是旧的 480px」——静态资源被长缓存。现已覆盖 6 个核心资源。
+- 2026-10-13 按主人要求**精简模型**：删除 `whale-girl`（大肥鱼）/ `izumi` / `nito`，**只保留 `shizuku`（橙色双马尾）**并设为默认。`source/live2d/` 体积 12M → 3.4M。Cubism 4 内核保留备用（见模型清单节）。

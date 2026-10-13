@@ -345,32 +345,11 @@
   },
   "models": [
     {
-      "name": "whale-girl",
-      "paths": [
-        "/live2d/models/whale-girl/c_0120.model3.json"
-      ],
-      "message": "我是小鲸鱼女仆～今天也要好好干活哦！"
-    },
-    {
       "name": "shizuku",
       "paths": [
         "/live2d/models/shizuku/shizuku.model.json"
       ],
       "message": "我是 shizuku，请多关照～"
-    },
-    {
-      "name": "izumi",
-      "paths": [
-        "/live2d/models/izumi/izumi.model.json"
-      ],
-      "message": "我是 izumi 哦～"
-    },
-    {
-      "name": "nito",
-      "paths": [
-        "/live2d/models/nito/nito.model.json"
-      ],
-      "message": "我是 nito，今天也一起加油吧～"
     }
   ]
 }

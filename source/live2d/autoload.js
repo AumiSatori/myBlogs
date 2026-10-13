@@ -13,7 +13,7 @@
  *   ① 本文件的 ASSET_VERSION（管 waifu.css / live2d-custom.css / waifu-tips.js / 内核 / 模型 json）
  *   ② _config.butterfly.yml 里 autoload.js 自己的 ?v=（管本文件，不改它新版加载器根本进不来）
  */
-const ASSET_VERSION = '20261013a';
+const ASSET_VERSION = '20261013b';
 
 // 资源根目录（本站自托管）
 const live2d_path = '/live2d/';
