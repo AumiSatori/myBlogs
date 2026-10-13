@@ -1,0 +1,92 @@
+# ==========================================
+# Butterfly 主题自定义配置
+# 未在此文件出现的配置项，沿用主题默认值
+# 主题默认与全部可选项：node_modules/hexo-theme-butterfly/_config.yml
+# 官方文档：https://butterfly.js.org/
+# ==========================================
+
+# ---------- 顶部导航（菜单）----------
+menu:
+  首页: / || fas fa-home
+  归档: /archives/ || fas fa-archive
+  标签: /tags/ || fas fa-tags
+  分类: /categories/ || fas fa-folder-open
+  关于: /about/ || fas fa-heart
+
+# ---------- 社交图标（填上自己的链接后启用）----------
+social:
+  # fab fa-github: https://github.com/你的用户名 || Github || '#24292e'
+
+# ---------- 代码块 ----------
+code_blocks:
+  theme: light
+  macStyle: true
+  copy: true
+  language: true
+
+# ---------- 首页副标题（打字机效果）----------
+subtitle:
+  enable: true
+  effect: true
+  sub:
+    - 记录技术笔记与踩坑日常
+
+# 首页文章摘要长度
+index_post_content:
+  method: 3
+  length: 200
+
+# ---------- 深色模式 ----------
+darkmode:
+  enable: true
+  button: true
+  autoChangeMode: false
+
+# ---------- 搜索（本地搜索，无需外部服务）----------
+search:
+  use: local_search
+  placeholder: 搜索文章...
+  local_search:
+    preload: true
+
+# ---------- 评论系统：Giscus（基于 GitHub Discussions，免费、无后端）----------
+# 启用步骤：
+#   1. 在 GitHub 建一个 Public 仓库放博客源码，仓库 Settings 里开启 Discussions
+#   2. 打开 https://giscus.app/zh-CN ，填入仓库名，拿到 repo_id 和 category_id
+#   3. 填到下面三行，并把 use 改成 giscus
+comments:
+  use:
+  text: true
+  lazyload: true
+  count: false
+  card_post_count: false
+
+giscus:
+  repo:
+  repo_id:
+  category_id:
+  light_theme: light
+  dark_theme: dark
+
+# ---------- 侧栏 ----------
+aside:
+  card_author:
+    enable: true
+    description: 记录技术笔记与踩坑日常
+    button:
+      enable: true
+      icon: fab fa-github
+      text: Follow Me
+      link: https://github.com/xxxxxx
+  card_announcement:
+    enable: true
+    content: 这里是我的数字自留地，记录技术笔记、踩坑与思考。
+
+# ---------- 页脚 ----------
+footer:
+  owner:
+    enable: true
+    since: 2026
+
+# ---------- 默认显示模式：浅色 ----------
+display_mode: light
