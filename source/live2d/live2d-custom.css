@@ -29,6 +29,12 @@
 	width: 100%;
 }
 
+/* 原组件默认向下偏移 25px；半身镜头需要完整显示裙摆，避免被视口底部裁掉。 */
+#waifu,
+#waifu:hover {
+	transform: none;
+}
+
 /* canvas 默认是 inline，底部会多出一截行高空隙；
    尺寸同时决定模型的实际显示大小（Cubism 4 模型按 canvas 等比缩放） */
 #live2d {

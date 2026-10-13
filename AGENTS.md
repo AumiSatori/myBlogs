@@ -48,7 +48,7 @@ myBlogs/
 
 `.gitignore` 忽略了 `public/`、`node_modules/`、`db.json`、`.idea/`。因此：
 
-- **`source/` 下的所有静态资源都会提交到 Git**，包括 Live2D 模型（当前约 12M）。Cloudflare 构建时再拷进 `public/`。
+- **`source/` 下的所有静态资源都会提交到 Git**，包括 Live2D 模型（各模型体积见下文）。Cloudflare 构建时再拷进 `public/`。
 - 往 `source/` 放东西前先想清楚体积，大文件别随手扔进去。
 
 ### 2. 注入机制
@@ -96,10 +96,10 @@ _config.butterfly.yml (inject.bottom)
 
 | 目录 | 格式 | 内核 | 体积 | 说明 |
 | --- | --- | --- | --- | --- |
-| `da-feiyu/` | Cubism 4（`.moc3`） | `live2dcubismcore.min.js` | 2.5M | **默认模型**，大肥鱼（B 站免费模型，**围裙带原作者署名水印**） |
+| `da-feiyu/` | Cubism 4（`.moc3`） | `live2dcubismcore.min.js` | 2.5M | **默认模型**，大肥鱼（B 站免费模型，**使用作者提供的开关关闭水印，显示头顶到裙摆、不显示腿部**） |
 | `shizuku/` | Cubism 2（`.moc`） | `live2d.min.js` | 2.7M | 橙色双马尾，可切换 |
 
-`da-feiyu` 原始纹理为 **8192×8192 / 30MB**，已压缩为 **2048×2048 / 1.12MB**（看板娘显示仅 200~240px，8~10 倍超采样足够），故目录名为 `大肥鱼.2048`。已删除 VTube Studio 专用文件（`*.vtube.json`、`items_pinned_to_model.json`），与本项目无关。
+`da-feiyu` 原始纹理为 **8192×8192 / 30MB**，已压缩为 **2048×2048 / 1.12MB**，故目录名为 `大肥鱼.2048`。当前通过模型镜头和内部渲染缓冲改善 200~240px 下的清晰度，保留现有纹理。已删除 VTube Studio 专用文件（`*.vtube.json`、`items_pinned_to_model.json`），与本项目无关。
 
 ⚠️ **模型文件路径含中文**（`大肥鱼.model3.json`）。hexo / 浏览器 / Cubism 都能正确处理，但用脚本或命令行处理时记得 URL 编码。
 
@@ -107,9 +107,11 @@ _config.butterfly.yml (inject.bottom)
 
 - 模型自带**两处水印贴图 ArtMesh**（`水印.png` / `水印2.png`），**渲染在白色围裙上**，内容为：
   `免费使用 禁止贩卖` / `绘画/Must: GPT-6` / `建模/Rigger: 香甜小兔子` / `Bilibili工房` / `用户: Mao绒绒家园` / `UID: 431301506`
-- 原作者在 VTube Studio 里留了消除开关：参数 **`Paramcol_3`（显示名「3.水印消除」）= 1.0**，对应文件 `EXP/13 水印消除.exp3.json`（`Blend: Add`）。
-- ⚠️ **已试过但没成功的方案**：给 `model3.json` 注册一个 Idle motion（`Curves` 直接把 `Paramcol_3` 钉在 1.0）。运行时**确实每帧都会 `startRandomMotion("Idle", 1)`**、motion 文件也被反复加载，但水印不消失 ⇒ 该参数不是简单开关，别在这条路上继续耗时间。真要消除只能**改纹理**（需先解析 `moc3` 拿水印 ArtMesh 的 UV）或宿主程序手动触发表达式。
-- 授权为「免费使用 禁止贩卖」⇒ 个人博客展示**无版权问题**；**官方建议保留署名**，本项目选择保留水印。
+- 原作者在 VTube Studio 里留了消除开关：参数 **`Paramcol_3`（显示名「3.水印消除」）= 1.0**，对应文件 `EXP/13 水印消除.exp3.json`（`Blend: Add`）。**已在浏览器真实渲染中验证原版表达式有效**，无需改纹理或 `moc3`。
+- 当前 `大肥鱼.model3.json` 在 `FileReferences.Expressions` 注册 `watermark-off`，指向上述表达式，并通过顶层 **`DefaultExpression: "watermark-off"`** 指定默认表情。`DefaultExpression` 是本项目对宿主加载器的扩展字段：`chunk/index2.js` 在模型贴图全部加载完成后启动它，表达式随后由表情管理器逐帧持续应用。宿主将默认表达式的淡入时长设为 **0**（原版表达式文件保持不变），避免模型出现后短暂显示水印。
+- ⚠️ **以前 Idle motion 失败的根因已查明**：首次按需加载 motion 的异步回调只给局部变量赋值，未开始播放，也未缓存该 motion；调用立即返回，导致每帧重复请求文件。**请求成功不等于 motion 已播放，不能据此认定 `Paramcol_3` 无效**。当前使用作者提供的表达式，不再走这条 Idle motion 路径。
+- 授权标识为「免费使用 禁止贩卖」。本项目初版选择保留围裙署名；**当前按用户要求使用作者提供的开关关闭水印**，原纹理和来源说明仍保留。
+- 当前仅注册这一项表情。以后若增加其他可切换表情，新的 `setExpression()` 会淡出旧表情，需检查是否仍保留去水印效果。
 
 
 ### 换模型 / 调位置 / 关闭
@@ -118,7 +120,8 @@ _config.butterfly.yml (inject.bottom)
 | --- | --- |
 | 换模型、调顺序、改默认 | `source/live2d/waifu-tips.json` 的 `models` 数组（**第 0 项即默认**） |
 | 调看板娘大小 | `source/live2d/live2d-custom.css` 顶部的 `--waifu-size`（默认 240px；中等屏 992~1599px 自动降为 200px） |
-| 调看板娘位置 / 让位间距 | 同上文件；`--waifu-gap` 控制看板娘顶部与 `#rightside` 的间距 |
+| 调大肥鱼镜头 / 半身范围 | `source/live2d/models/da-feiyu/大肥鱼.model3.json` 的 `Layout`（当前 `height: 3.1`、`y: -0.52`，显示头顶到裙摆，腿部裁到画布外） |
+| 调看板娘位置 / 让位间距 | `source/live2d/live2d-custom.css`；`--waifu-gap` 控制看板娘顶部与 `#rightside` 的间距 |
 | 换气泡文案 / 事件提示 | `source/live2d/waifu-tips.json` 的 `message` / `mouseover` / `click` / `seasons` |
 | 关闭看板娘 | 注释掉 `_config.butterfly.yml` 里 `inject.bottom` 那行 |
 
@@ -134,6 +137,10 @@ _config.butterfly.yml (inject.bottom)
 
 Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
 
+大肥鱼的 `Layout` 只改变该模型的镜头，不改变看板娘容器或主题按钮让位高度。当前宿主识别的小写键为 `height` / `width` / `y` / `center_y` 等：`height` 等比放大，`y` 直接平移；不要写成 `Height` / `CenterY`。调整后必须看真实渲染，确认头顶、两侧头发和裙摆没有被误裁。
+
+`live2d-custom.css` 覆盖了组件默认的 `translateY(25px)` 和 hover 偏移，让整个半身画布留在视口内，避免裙摆被屏幕底部再次裁掉。隐藏看板娘时，运行时保留上次有效缓冲，并跳过零尺寸指针换算。
+
 ### 踩坑记录（改这块前必读）
 
 1. **`screen.width` 在无头 Chrome 下恒为 800**，不受 `--window-size` 影响。判断是否加载看板娘**必须用 `window.innerWidth`**。
@@ -148,16 +155,16 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
 9. **`<canvas id="live2d">` 的 `width` / `height` 属性 ≠ 显示大小**，别被它误导：
    - 属性值 = **内部渲染缓冲分辨率**，由 `waifu-tips.js` 初始写成 `800x800`；
    - 显示大小 = `live2d-custom.css` 里 CSS 的 `--waifu-size`，两者互相独立；
-   - **Cubism 4 模型**（如已删除的 `whale-girl`）加载后，运行时会**把属性改写**成 CSS 尺寸（如 `200x200`）；
-     **Cubism 2 模型**（当前的 `shizuku`）**不改写，保持 `800x800`**；
-   - ⇒ **当前只剩 shizuku（Cubism 2），所以线上看到的 canvas 属性就是 `800x800`**，属正常现象，别误判成「尺寸没生效」；
-   - ⇒ 在 DevTools 里看到 `800x800` 属**正常现象**（说明当前加载的是 Cubism 2 模型），**显示尺寸仍由 CSS 决定**，且内部 800 反而让画面更锐利。要核对实际大小，看 **Computed** 里的 `width` / `height`，或直接看视觉。
+   - **Cubism 4/5 模型**（当前默认的 `da-feiyu`）加载后，运行时按 **`min(3, max(2, devicePixelRatio))`** 设置缓冲倍率，再把属性改写为 CSS 尺寸乘该倍率并取整；DPR 为 1 或 2 时，200px 对应 `400x400`，240px 对应 `480x480`，DPR 大于 2 时最多 3 倍；
+     **Cubism 2 模型**（`shizuku`）**不改写，保持初始 `800x800`**；
+   - 鼠标位置按 `canvas.width / getBoundingClientRect().width` 和对应高度比例映射到缓冲坐标，再交给模型投影。提升缓冲倍率时不能继续只乘 DPR，否则点击和鼠标跟随会错位；坐标使用 `clientX` / `clientY` 与视口矩形配对；
+   - ⇒ 默认模型和切换模型的缓冲尺寸不同属正常现象。**显示尺寸仍由 CSS 决定**；核对实际大小看 **Computed** 或 `getBoundingClientRect()`，验证缓冲时按当前模型、CSS 尺寸与 DPR 计算，不要断言固定 `400x400`。
 10. **改了 `/live2d/` 下的文件、线上却没变 ⇒ 先怀疑缓存**。Cloudflare 对静态资源做长缓存，URL 不变时浏览器会一直吃旧文件。本项目用 **`?v=` 版本号**解决，**改完必须同步更新两处**（否则白改）：
     - `source/live2d/autoload.js` 顶部的 `ASSET_VERSION` —— 管 `waifu.css` / `live2d-custom.css` / `waifu-tips.js` / 两个内核 / `waifu-tips.json`；
     - `_config.butterfly.yml` 里 `autoload.js` 自己的 `?v=` —— 管**加载器本身**，不改它新版加载器根本进不来。
-    - 约定：`20261013a` → `20261013b` → …（日期 + 递增字母）。
-    - ⚠️ **局限**：模型文件（`models/**` 下的纹理 / 表情 / motion / `moc3`）与 `chunk/index*.js` **不带版本号**（前者路径写在 `waifu-tips.json` 里、后者由 `waifu-tips.js` 内部 `import()`），**替换同名模型文件时仍需手动强刷一次**。
-    - 已实测：核心 6 个资源请求均带 `?v=`；模型资源（`models/**`）不带（数量随模型而定）。
+    - 约定：`20261013a` → `20261013b` → …（日期 + 递增字母）；**当前版本为 `20261013d`**。
+    - `waifu-tips.js` 将自己的 `?v=` 传给动态导入的 **`chunk/index.js` / `chunk/index2.js`**，并传给本地模型入口 **`.model.json` / `.model3.json`** 的请求；修改宿主脚本或模型 `Layout` / `DefaultExpression` 时也能随本轮版本刷新。
+    - ⚠️ **局限**：模型 JSON 内相对引用的**纹理 / 表情（EXP）/ motion / `moc3` / 物理文件等仍不带版本号**。替换这些同名资源后仍需手动强刷或更换文件名，不能认为入口 JSON 带版本就会给所有依赖自动加版本。
 11. **`hexo generate` 是增量生成，不会清理 `public/` 里 source 已删的文件**。删掉 `source/` 下某个文件后，`public/` 里的旧副本仍然在，本地预览会出现「删了却还在」的假象（**线上不受影响**，Cloudflare 是干净 checkout）。⇒ 删文件后手动清掉 `public/` 对应路径。
 
 ### 本地验证手法
@@ -179,8 +186,9 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 
 检查项：
 
-- `document.getElementById('live2d')` 存在、`canvas.width === 400`、WebGL 上下文未丢失
-- 把 canvas 画到临时 2D canvas 上统计非透明像素占比（正常约 20%~55%，0% 说明模型没画出来）
+- `document.getElementById('live2d')` 存在、WebGL 上下文未丢失；CSS 显示尺寸符合 `--waifu-size`，缓冲尺寸按上述当前模型与 DPR 规则计算
+- 把 canvas 画到临时 2D canvas 上统计非透明像素占比（0% 说明模型没画出来；占比随半身镜头和模型而变化，不用旧全身比例作为固定断言）
+- 大肥鱼围裙无水印，入场后和持续运行均保持；画面完整显示头顶到裙摆，腿部不显示，鼠标跟随位置与画面一致
 - 监听 `console` / `pageerror` / `requestfailed`，确认无 Live2D 相关报错
 - 依次点击 `#waifu-tool-switch-model` 遍历所有模型，核对 `localStorage.modelId` 与渲染结果
 
@@ -202,3 +210,6 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 - 2026-10-13 接入 **`?v=` 缓存版本号**：`autoload.js` 的 `ASSET_VERSION` + `_config.butterfly.yml` 里 `autoload.js` 的 `?v=`。起因是「改了 CSS、线上仍是旧的 480px」——静态资源被长缓存。现已覆盖 6 个核心资源。
 - 2026-10-13 按主人要求**精简模型**：删除 `whale-girl`（大肥鱼）/ `izumi` / `nito`，**只保留 `shizuku`（橙色双马尾）**并设为默认。`source/live2d/` 体积 12M → 3.4M。Cubism 4 内核保留备用（见模型清单节）。
 - 2026-10-13 接入 B 站免费模型 **`da-feiyu`（大肥鱼）**并设为默认：纹理 8192→2048 压缩（30M→1.1M），清理 VTube Studio 专用文件；**围裙带原作者署名水印，按「免费使用」授权选择保留**。缓存版本号 → `20261013c`。
+- 2026-10-13 按用户要求使用作者提供的**水印消除表达式**关闭围裙水印：注册 `watermark-off` / `DefaultExpression`，贴图加载完成后自动持续启动，宿主将淡入时长设为 0；实测表达式有效，修正以前将 Idle motion 未播放误判为参数无效的说明。
+- 2026-10-13 大肥鱼镜头调整为 `Layout.height: 3.1` / `Layout.y: -0.52`，显示头顶到裙摆、裁掉腿部；CSS 显示尺寸保持 240px / 中等屏 200px。Cubism 4/5 缓冲提升为最低 2 倍、最高 3 倍，并按实际缓冲比例映射指针坐标。
+- 2026-10-13 缓存版本号更新为 **`20261013d`**；`waifu-tips.js` 将版本号传给两个 runtime chunk 和本地模型入口 JSON，模型的相对依赖资源仍需单独处理同名替换缓存。以上为项目文件变更记录，不代表已推送或已上线。
