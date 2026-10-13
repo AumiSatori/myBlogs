@@ -90,3 +90,11 @@ footer:
 
 # ---------- 默认显示模式：浅色 ----------
 display_mode: light
+
+# ---------- 访问统计 ----------
+# 暂关闭 busuanzi 统计（本地预览会显示异常数据）；
+# 部署后建议用 Cloudflare 自带的 Web Analytics（免费、无第三方脚本）
+busuanzi:
+  site_uv: false
+  site_pv: false
+  page_pv: false
