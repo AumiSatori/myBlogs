@@ -102,9 +102,13 @@ busuanzi:
 # ---------- 自定义注入 ----------
 # Live2D 看板娘（右下角）——资源全部自托管在 source/live2d/ 下，不依赖外部 CDN
 # 换模型：改 source/live2d/waifu-tips.json 里的 models 数组
-# 调位置：改 source/live2d/live2d-custom.css
-# 关闭：把下面的 bottom 那行注释掉即可
+# 调大小：改 source/live2d/live2d-custom.css 顶部的 --waifu-size
+# 调位置：同上文件；关闭：把下面的 bottom 那行注释掉即可
+#
+# ⚠️ 末尾的 ?v= 是缓存版本号。改动 source/live2d/ 下任何文件后，
+#    必须同时更新这里的 ?v= 和 source/live2d/autoload.js 里的 ASSET_VERSION，
+#    否则浏览器会吃旧缓存，出现「改了但线上没变」。
 inject:
   head:
   bottom:
-    - <script src="/live2d/autoload.js"></script>
+    - <script src="/live2d/autoload.js?v=20261013a"></script>

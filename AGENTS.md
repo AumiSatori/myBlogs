@@ -78,18 +78,18 @@ inject:
 
 ```
 _config.butterfly.yml (inject.bottom)
-  └─ /live2d/autoload.js                      ← 自写加载器
+  └─ /live2d/autoload.js?v=<版本号>            ← 自写加载器（版本号规则见踩坑第 10 条）
        ├─ 窄屏拦截：window.innerWidth < 992 直接 return
        ├─ 给 Image 打 crossOrigin 补丁（避免贴图跨域）
-       ├─ await 加载 waifu.css + waifu-tips.js（后者是 ES module）
-       ├─ await 加载 live2d-custom.css        ← 必须晚于 waifu.css
+       ├─ await 加载 waifu.css?v= + waifu-tips.js?v=（后者是 ES module）
+       ├─ await 加载 live2d-custom.css?v=      ← 必须晚于 waifu.css
        └─ initWidget({
-              waifuPath:    /live2d/waifu-tips.json,
-              cubism2Path:  /live2d/live2d.min.js,          ← Cubism 2 内核
-              cubism5Path:  /live2dcubismcore.min.js,       ← Cubism 4/5 内核
+              waifuPath:    /live2d/waifu-tips.json?v=,
+              cubism2Path:  /live2d/live2d.min.js?v=,       ← Cubism 2 内核
+              cubism5Path:  /live2dcubismcore.min.js?v=,    ← Cubism 4/5 内核
               tools: ['hitokoto','switch-model','switch-texture','photo','info','quit'],
               drag: false,
-          })
+          })                                        ← 以上路径统一由 asset() 挂 ?v=
 ```
 
 ### 模型清单
@@ -142,6 +142,12 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
    - **Cubism 4 模型**（`whale-girl`）加载后，运行时会**把属性改写**成 CSS 尺寸（如 `200x200`）；
      **Cubism 2 模型**（`shizuku` / `izumi` / `nito`）**不改写，保持 `800x800`**；
    - ⇒ 在 DevTools 里看到 `800x800` 属**正常现象**（说明当前加载的是 Cubism 2 模型），**显示尺寸仍由 CSS 决定**，且内部 800 反而让画面更锐利。要核对实际大小，看 **Computed** 里的 `width` / `height`，或直接看视觉。
+10. **改了 `/live2d/` 下的文件、线上却没变 ⇒ 先怀疑缓存**。Cloudflare 对静态资源做长缓存，URL 不变时浏览器会一直吃旧文件。本项目用 **`?v=` 版本号**解决，**改完必须同步更新两处**（否则白改）：
+    - `source/live2d/autoload.js` 顶部的 `ASSET_VERSION` —— 管 `waifu.css` / `live2d-custom.css` / `waifu-tips.js` / 两个内核 / `waifu-tips.json`；
+    - `_config.butterfly.yml` 里 `autoload.js` 自己的 `?v=` —— 管**加载器本身**，不改它新版加载器根本进不来。
+    - 约定：`20261013a` → `20261013b` → …（日期 + 递增字母）。
+    - ⚠️ **局限**：模型文件（`models/**` 下的纹理 / 表情 / motion / `moc3`）与 `chunk/index*.js` **不带版本号**（前者路径写在 `waifu-tips.json` 里、后者由 `waifu-tips.js` 内部 `import()`），**替换同名模型文件时仍需手动强刷一次**。
+    - 已实测：核心 6 个资源请求均带 `?v=`，模型资源 60 个请求不带（预期内）。
 
 ### 本地验证手法
 
@@ -182,3 +188,4 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 - 2026-10-13 Live2D 看板娘上线：live2d-widgets 全自托管方案，初版 3 个 Cubism 2 模型（shizuku / izumi / nito），默认 shizuku。
 - 2026-10-13 新增 Cubism 4 模型 `whale-girl`（小鲸鱼女仆），接入 `live2dcubismcore.min.js` 双内核加载链，并设为默认模型。已验证 4 个模型均可正常渲染与切换。
 - 2026-10-13 看板娘尺寸减半（480→240px，中等屏 400→200px），并把尺寸抽成 `--waifu-size` / `--waifu-gap` 变量统一控制；`#waifu-tool` 的纵向位置改为跟随尺寸计算。
+- 2026-10-13 接入 **`?v=` 缓存版本号**：`autoload.js` 的 `ASSET_VERSION` + `_config.butterfly.yml` 里 `autoload.js` 的 `?v=`。起因是「改了 CSS、线上仍是旧的 480px」——静态资源被长缓存。现已覆盖 6 个核心资源。
