@@ -6,12 +6,23 @@
  *    否则同优先级下会被 waifu.css 的默认样式覆盖。
  */
 
+/* ---------- 尺寸总开关 ----------
+ * 想整体放大 / 缩小看板娘，只改 --waifu-size 一个值即可。
+ * 它是 canvas 的边长，模型按 canvas 等比缩放；
+ * ⚠️ 注意「大小」的感觉是按面积算的：边长减半 = 视觉上小到 1/4。
+ * --waifu-gap 是看板娘顶部与主题按钮组 #rightside 之间预留的空隙。
+ */
+:root {
+	--waifu-size: 240px;
+	--waifu-gap: 40px;
+}
+
 /* ---------- 容器：左下角 -> 右下角 ---------- */
 #waifu {
 	left: auto;
 	right: 0;
 	/* #waifu-canvas 是块级元素，不给宽度会撑满整个视口 */
-	width: 480px;
+	width: var(--waifu-size);
 }
 
 #waifu-canvas {
@@ -22,8 +33,8 @@
    尺寸同时决定模型的实际显示大小（Cubism 4 模型按 canvas 等比缩放） */
 #live2d {
 	display: block;
-	height: 480px;
-	width: 480px;
+	height: var(--waifu-size);
+	width: var(--waifu-size);
 }
 
 /* ---------- 收起后的「召唤」按钮也跟着挪到右边 ---------- */
@@ -46,10 +57,12 @@
 	margin-right: -30px;
 }
 
-/* ---------- 工具条移到模型左侧，避免超出屏幕右缘 ---------- */
+/* ---------- 工具条移到模型左侧，避免超出屏幕右缘 ----------
+   纵向位置跟随模型高度（原为固定 70px，是按 480px 的模型定的） */
 #waifu-tool {
 	left: -10px;
 	right: auto;
+	top: calc(var(--waifu-size) * 0.15);
 }
 
 /* ---------- 气泡提示向左展开 ---------- */
@@ -63,23 +76,14 @@
 /* ---------- 给主题右下角的按钮组（#rightside）让位 ---------- */
 @media screen and (min-width: 992px) {
 	#rightside {
-		bottom: 520px;
+		bottom: calc(var(--waifu-size) + var(--waifu-gap));
 	}
 }
 
-/* ---------- 中等屏幕：缩小一圈，免得压住右侧栏 ---------- */
+/* ---------- 中等屏幕：再缩一圈，免得压住右侧栏 ---------- */
 @media screen and (min-width: 992px) and (max-width: 1599px) {
-	#waifu {
-		width: 400px;
-	}
-
-	#live2d {
-		height: 400px;
-		width: 400px;
-	}
-
-	#rightside {
-		bottom: 440px;
+	:root {
+		--waifu-size: 200px;
 	}
 }
 

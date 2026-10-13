@@ -108,7 +108,8 @@ _config.butterfly.yml (inject.bottom)
 | 想做什么 | 到哪里改 |
 | --- | --- |
 | 换模型、调顺序、改默认 | `source/live2d/waifu-tips.json` 的 `models` 数组（**第 0 项即默认**） |
-| 调看板娘位置、大小、让位 | `source/live2d/live2d-custom.css` |
+| 调看板娘大小 | `source/live2d/live2d-custom.css` 顶部的 `--waifu-size`（默认 240px；中等屏 992~1599px 自动降为 200px） |
+| 调看板娘位置 / 让位间距 | 同上文件；`--waifu-gap` 控制看板娘顶部与 `#rightside` 的间距 |
 | 换气泡文案 / 事件提示 | `source/live2d/waifu-tips.json` 的 `message` / `mouseover` / `click` / `seasons` |
 | 关闭看板娘 | 注释掉 `_config.butterfly.yml` 里 `inject.bottom` 那行 |
 
@@ -133,6 +134,8 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
 5. **Cubism 2 与 Cubism 4 是两套内核**：`.moc` 模型走 `live2d.min.js`（配 `chunk/index.js`），`.moc3` 模型走 `live2dcubismcore.min.js`（配 `chunk/index2.js`）。`initWidget` 的 `cubism2Path` / `cubism5Path` 两个参数**都要给**，否则切换到对应格式的模型时会静默失败（控制台报 "No cubismXPath set"）。
 6. **`#waifu` 的 `bottom` 过渡时长是 3 秒**（`transition: ... bottom 3s ease-in-out`）。自动截图验证时**必须等 ≥4 秒**再截，否则会截到入场动画中途，看起来像模型被视口裁掉。
 7. **`oh-my-live2d` 的官方模型域名 `model.oml2d.com` 已被抢注**，返回垃圾站 HTML，官方文档里的模型地址全部失效。不要回退到那套方案。
+8. **看板娘尺寸统一由 `--waifu-size` 一个变量控制**，它同时决定 `#waifu` 宽度、`#live2d` 画布边长，以及 `#rightside` 的让位高度（`calc(var(--waifu-size) + var(--waifu-gap))`）。改尺寸**只改这个变量**，别去单独改 `#live2d` 的宽高，否则主题按钮组会错位。
+   - ⚠️ 「大小」的观感按**面积**算：`--waifu-size` 减半 = 视觉上小到 **1/4**。
 
 ### 本地验证手法
 
@@ -172,3 +175,4 @@ python -m http.server 8899 --directory public --bind 127.0.0.1
 - 2026-10-13 建立本文件。
 - 2026-10-13 Live2D 看板娘上线：live2d-widgets 全自托管方案，初版 3 个 Cubism 2 模型（shizuku / izumi / nito），默认 shizuku。
 - 2026-10-13 新增 Cubism 4 模型 `whale-girl`（小鲸鱼女仆），接入 `live2dcubismcore.min.js` 双内核加载链，并设为默认模型。已验证 4 个模型均可正常渲染与切换。
+- 2026-10-13 看板娘尺寸减半（480→240px，中等屏 400→200px），并把尺寸抽成 `--waifu-size` / `--waifu-gap` 变量统一控制；`#waifu-tool` 的纵向位置改为跟随尺寸计算。
