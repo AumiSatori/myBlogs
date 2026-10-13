@@ -1,15 +1,24 @@
 # 我的技术博客
 
-Hexo + Butterfly 主题 + Cloudflare Pages 的个人技术博客。
+Hexo + Butterfly 主题 + Cloudflare 的个人技术博客。
 
 ---
 
 ## 当前状态
 
 - [x] 本地搭建完成：首页 / 文章 / 归档 / 标签 / 分类 / 关于、深色模式、本地搜索、代码高亮
-- [ ] 上线部署（需要 GitHub 账号 + Cloudflare 账号，见下文）
-- [ ] 评论系统启用（Giscus，等仓库建好后配置）
+- [x] 已上线：**https://myblogs.jjyilinfeng1234.workers.dev**（push 即自动部署）
+- [ ] 评论系统启用（Giscus）
 - [ ] 站点信息个性化（名字、头像、社交链接等）
+
+### ⚠️ 关于域名访问
+
+当前是 Cloudflare 免费域名（`*.workers.dev`），**该域名在国内直连需要代理**（DNS 被污染，普通网络打不开）。
+
+想让自己和国内的朋友都能随时访问，建议以后绑定一个自己的域名（约 60~100 元/年）：
+
+- Cloudflare 控制台 → 进入 `myblogs` 项目 → **Settings → Domains & Routes → Add Custom Domain**
+- 按提示在域名服务商处添加一条 CNAME 记录即可
 
 ## 目录速览
 
@@ -56,38 +65,20 @@ description: （可选）首页列表里显示的摘要
 正文用 Markdown 写……
 ```
 
-## 部署到 Cloudflare Pages（免费）
+## 部署信息（已完成）
 
-### 第一步：推到 GitHub
+| 项目 | 值 |
+| --- | --- |
+| 平台 | Cloudflare（Git 集成自动构建） |
+| 线上地址 | https://myblogs.jjyilinfeng1234.workers.dev |
+| 源码仓库 | https://github.com/AumiSatori/myBlogs |
+| 构建命令 | `npm run build` |
+| 输出目录 | `public` |
+| 环境变量 | `NODE_VERSION=22` |
 
-本地仓库已初始化好（分支 `main`）。先在 GitHub 网页建一个仓库：
+**更新流程**：改内容 → `git add . && git commit -m "..." && git push` → Cloudflare 自动重新构建发布（约 1~2 分钟）。
 
-- 仓库名随意，例如 `blog`
-- 建议设为 **Public**（之后启用评论 Giscus 需要）
-- 不要勾选 "Add a README"（保持空仓库）
-
-然后在本目录执行：
-
-```bash
-git remote add origin https://github.com/<你的用户名>/<仓库名>.git
-git push -u origin main
-```
-
-### 第二步：连接 Cloudflare Pages
-
-1. 登录 Cloudflare 控制台 → 左侧 **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-2. 授权 GitHub，选择博客仓库
-3. 构建设置：
-   - Build command：`npm run build`
-   - Build output directory：`public`
-   - 环境变量：`NODE_VERSION` = `22`
-4. 保存并部署 → 获得免费域名 `xxx.pages.dev`
-
-### 第三步：回填域名
-
-把 `_config.yml` 里的 `url` 改成实际地址（如 `https://xxx.pages.dev`），提交推送，等重新部署完成。
-
-> 之后每次 `git push`，Cloudflare 都会自动重新构建发布。
+> Cloudflare 控制台入口：https://dash.cloudflare.com/ → Workers & Pages → `myblogs` 项目
 
 ## 启用评论（Giscus）
 
