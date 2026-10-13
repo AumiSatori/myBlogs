@@ -148,7 +148,8 @@ Cubism 4 模型填 `.model3.json`，Cubism 2 模型填 `.model.json`。
     - `_config.butterfly.yml` 里 `autoload.js` 自己的 `?v=` —— 管**加载器本身**，不改它新版加载器根本进不来。
     - 约定：`20261013a` → `20261013b` → …（日期 + 递增字母）。
     - ⚠️ **局限**：模型文件（`models/**` 下的纹理 / 表情 / motion / `moc3`）与 `chunk/index*.js` **不带版本号**（前者路径写在 `waifu-tips.json` 里、后者由 `waifu-tips.js` 内部 `import()`），**替换同名模型文件时仍需手动强刷一次**。
-    - 已实测：核心 6 个资源请求均带 `?v=`，模型资源 60 个请求不带（预期内）。
+    - 已实测：核心 6 个资源请求均带 `?v=`；模型资源（`models/**`）不带（数量随模型而定）。
+11. **`hexo generate` 是增量生成，不会清理 `public/` 里 source 已删的文件**。删掉 `source/` 下某个文件后，`public/` 里的旧副本仍然在，本地预览会出现「删了却还在」的假象（**线上不受影响**，Cloudflare 是干净 checkout）。⇒ 删文件后手动清掉 `public/` 对应路径。
 
 ### 本地验证手法
 
