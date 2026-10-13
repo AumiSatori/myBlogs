@@ -11,8 +11,8 @@ author: Yi
 language: zh-CN
 timezone: 'Asia/Shanghai'
 
-# URL（部署后把 url 改成实际域名，如 https://xxx.pages.dev 或自定义域名）
-url: http://localhost:4000
+# URL（部署地址：Cloudflare Workers）
+url: https://myblogs.jjyilinfeng1234.workers.dev
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
